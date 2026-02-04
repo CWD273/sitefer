@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Frame Viewer</title>
+
+  <style>
+    :root {
+      /* iOS-safe viewport height */
+      --vh: 1vh;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+      display: flex;
+      flex-direction: column;
+      height: calc(var(--vh) * 100);
+      overflow: hidden;
+    }
+
+    /* HEADER (same as homepage) */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 24px;
+      background: #ffffff;
+      border-bottom: 1px solid #ddd;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 5;
+    }
+
+    header img {
+      width: 40px;
+      height: 40px;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      margin: 0;
+    }
+
+    /* MAIN CONTENT */
+    #content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    iframe {
+      flex: 1;
+      width: 100%;
+      border: none;
+      background: #000;
+    }
+
+    /* BOTTOM BAR */
+    #bottom-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: #ffffff;
+      border-top: 1px solid #ddd;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 5;
+    }
+
+    #bottom-bar h2 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    /* FULLSCREEN BUTTON */
+    #fs-btn {
+      background: #eee;
+      border: 1px solid #ccc;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      z-index: 10;
+      position: relative; /* normal mode: stays in bar */
+    }
+
+    /* When fullscreen: float top-right */
+    .fullscreen-active #fs-btn {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      background: #fff;
+      border: 1px solid #aaa;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <img src="/img/icon.png" alt="Site Icon" />
+    <h1>UBGhub</h1>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <div id="content">
+    <iframe id="frame" src="/frames/1"></iframe>
+
+    <!-- BOTTOM BAR -->
+    <div id="bottom-bar">
+      <h2>Block Blast</h2>
+      <button id="fs-btn">
+        <sup>⇱</sup><sub>⇲</sub>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    /* Fix iOS viewport height */
+    function updateVH() {
+      document.documentElement.style.setProperty(
+        "--vh",
+        window.innerHeight * 0.01 + "px"
+      );
+    }
+    updateVH();
+    window.addEventListener("resize", updateVH);
+
+    const fsBtn = document.getElementById("fs-btn");
+    const content = document.getElementById("content");
+
+    function toggleFullscreen() {
+      const isFullscreen =
+        document.fullscreenElement || document.webkitFullscreenElement;
+
+      if (!isFullscreen) {
+        // ENTER FULLSCREEN
+        if (content.requestFullscreen) content.requestFullscreen();
+        else if (content.webkitRequestFullscreen) content.webkitRequestFullscreen();
+
+        document.body.classList.add("fullscreen-active");
+        fsBtn.innerHTML = "<sup>⇲</sup><sub>⇱</sub>"; // swap icons
+      } else {
+        // EXIT FULLSCREEN
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+
+        document.body.classList.remove("fullscreen-active");
+        fsBtn.innerHTML = "<sup>⇱</sup><sub>⇲</sub>"; // swap back
+      }
+    }
+
+    fsBtn.addEventListener("click", toggleFullscreen);
+  </script>
+
+</body>
+</html>
